@@ -76,6 +76,10 @@ class PrivateDatabaseModule implements IModule
 			$this->createDatabase();
 		};
 
+		$lifeCycle->onSetUp[] = function () {
+			$this->createDatabase();
+		};
+
 		$lifeCycle->onShutDown[] = function () {
 			$this->tearDownDatabase();
 		};
@@ -95,6 +99,10 @@ class PrivateDatabaseModule implements IModule
 
 	private function createDatabase()
 	{
+		if ($this->isInitialized) {
+			return;
+		}
+
 		$databaseName = $this->databaseName = sprintf('%s_%d', $this->namePrefix, $this->posix->getPid());
 		$schemaManager = $this->connection->getSchemaManager();
 
