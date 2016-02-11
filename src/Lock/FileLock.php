@@ -51,7 +51,7 @@ class FileLock implements ILock
 	 */
 	private function getHandle($file)
 	{
-		if (!isset($this->handles[$file])) {
+		if (!isset($this->handles[$file]) || !is_resource($this->handles[$file])) {
 			$this->handles[$file] = fopen($file, 'r');
 
 			if ($this->handles[$file] === FALSE) {
