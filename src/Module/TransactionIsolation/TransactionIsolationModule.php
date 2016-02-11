@@ -47,6 +47,7 @@ class TransactionIsolationModule implements IModule
 
 		$lifeCycle->onTearDown[] = function () {
 			$this->stopTransactionWrapper();
+			$this->entityManager->clear();
 		};
 	}
 
