@@ -45,7 +45,7 @@ class TransactionIsolationModule implements IModule
 			$this->startTransactionWrapper();
 		};
 
-		$lifeCycle->onSuccess[] = function () {
+		$lifeCycle->onTearDown[] = function () {
 			$this->stopTransactionWrapper();
 		};
 	}
