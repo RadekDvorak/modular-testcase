@@ -42,6 +42,11 @@ class PrivateDatabaseModule implements IModule
 	 */
 	private $dataLoader;
 
+	/**
+	 * @var bool
+	 */
+	private $isInitialized = FALSE;
+
 
 
 	/**
@@ -67,9 +72,10 @@ class PrivateDatabaseModule implements IModule
 	 */
 	public function listen(LifeCycle $lifeCycle)
 	{
-		$lifeCycle->onSetUp[] = function () {
+		$lifeCycle->onInitialized[] = function () {
 			$this->createDatabase();
 		};
+
 		$lifeCycle->onShutDown[] = function () {
 			$this->tearDownDatabase();
 		};
@@ -95,6 +101,7 @@ class PrivateDatabaseModule implements IModule
 		$schemaManager->dropAndCreateDatabase($databaseName);
 		$this->connection->exec("USE `$databaseName`");
 		$this->dataLoader->loadFiles($this->connection, $this->tableSqlFiles);
+		$this->isInitialized = TRUE;
 	}
 
 
@@ -105,6 +112,7 @@ class PrivateDatabaseModule implements IModule
 			$schemaManager = $this->connection->getSchemaManager();
 			$schemaManager->dropDatabase($this->databaseName);
 		}
+		$this->isInitialized = FALSE;
 	}
 
 }

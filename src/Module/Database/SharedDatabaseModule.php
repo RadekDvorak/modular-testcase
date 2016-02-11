@@ -62,7 +62,7 @@ class SharedDatabaseModule implements IModule
 	 */
 	public function listen(LifeCycle $lifeCycle)
 	{
-		$lifeCycle->onSetUp[] = function () {
+		$lifeCycle->onInitialized[] = function () {
 			$this->createDatabase();
 		};
 	}

@@ -7,6 +7,7 @@ use Nette\Object;
 
 
 /**
+ * @method onInitialized()
  * @method onSetUp()
  * @method onSuccess()
  * @method onException()
@@ -16,6 +17,11 @@ use Nette\Object;
  */
 class LifeCycle extends Object
 {
+
+	/**
+	 * @var \Closure[]
+	 */
+	public $onInitialized = [];
 
 	/**
 	 * @var \Closure[]

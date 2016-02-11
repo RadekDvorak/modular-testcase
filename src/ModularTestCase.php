@@ -57,6 +57,7 @@ class ModularTestCase extends TestCase
 	{
 		try {
 			$this->initializeModules($method);
+			$this->lifeCycle->onInitialized();
 			parent::runTest($method, $args);
 			$this->lifeCycle->onSuccess();
 		} catch (\Exception $e) {

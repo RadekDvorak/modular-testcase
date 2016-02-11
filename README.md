@@ -19,6 +19,7 @@ a lightweight mediator whose responsibility is to notify subscribed
 modules about test life-cycle changes. There are these life-cycle events
 at the moment:
 
+* initialized - called right before the test method is run.
 * setUp - called in setUp method; remeber to call parent::setUp() when
 overriding the method in a child test-case
 * success - called after the test method completes successfully
@@ -40,11 +41,14 @@ public function testFoo() {}
 ```
 
 The `"SHARED"` setting uses a single database for all tests.
-Tear down or update of the shared database is
-not implemented yet.
+The database is initialized and the connection is setup on
+the initialized event. Tear down or update of the shared
+database is not implemented yet.
 
 The `"PRIVATE"` settings creates and tears down a database
-per test method.
+per test method. Database is created and the connection is
+set up on the initialized event. The database is torn down
+on the shutdown event.
 
 
 ### Transaction isolation ###
