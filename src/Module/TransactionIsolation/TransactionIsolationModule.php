@@ -24,6 +24,11 @@ class TransactionIsolationModule implements IModule
 	 */
 	private $isImplicitFlushPrevented;
 
+	/**
+	 * @var bool
+	 */
+	private $isInitialized = FALSE;
+
 
 
 	/**
@@ -41,11 +46,19 @@ class TransactionIsolationModule implements IModule
 	 */
 	public function listen(LifeCycle $lifeCycle)
 	{
+		$lifeCycle->onInitialized[] = function () {
+			$this->startTransactionWrapper();
+		};
 		$lifeCycle->onSetUp[] = function () {
 			$this->startTransactionWrapper();
 		};
 
 		$lifeCycle->onTearDown[] = function () {
+			$this->stopTransactionWrapper();
+			$this->entityManager->clear();
+		};
+
+		$lifeCycle->onShutDown[] = function () {
 			$this->stopTransactionWrapper();
 			$this->entityManager->clear();
 		};
@@ -66,6 +79,10 @@ class TransactionIsolationModule implements IModule
 
 	private function startTransactionWrapper()
 	{
+		if ($this->isInitialized) {
+			return;
+		}
+
 		/** @var IWrappedConnection|Connection $connection */
 		$connection = $this->entityManager->getConnection();
 		$this->validateConnection($connection);
@@ -75,12 +92,18 @@ class TransactionIsolationModule implements IModule
 			$wrappedConnection = $this->getWrappedPDOConnection();
 			$wrappedConnection->wrap();
 		}
+
+		$this->isInitialized = TRUE;
 	}
 
 
 
 	private function stopTransactionWrapper()
 	{
+		if (!$this->isInitialized) {
+			return;
+		}
+
 		if ($this->isImplicitFlushPrevented) {
 			$wrappedConnection = $this->getWrappedPDOConnection();
 			$wrappedConnection->unwrap();
@@ -90,6 +113,7 @@ class TransactionIsolationModule implements IModule
 		$connection = $this->entityManager->getConnection();
 		$connection->unwrap();
 
+		$this->isInitialized = FALSE;
 	}
 
 

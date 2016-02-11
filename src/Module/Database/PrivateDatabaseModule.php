@@ -120,7 +120,6 @@ class PrivateDatabaseModule implements IModule
 			$schemaManager = $this->connection->getSchemaManager();
 			$schemaManager->dropDatabase($this->databaseName);
 		}
-		$this->isInitialized = FALSE;
 	}
 
 }
