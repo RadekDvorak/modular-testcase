@@ -66,7 +66,18 @@ especially useful for shared database setups provided by
 
 The `preventImplicitFlush` attribute decides if statements
 causing implicit commit are to be rejected (exception is
-thrown). See [MySQL Docs](https://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html). 
+thrown). See [MySQL Docs](https://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html).
+
+#### Notes ####
+The serializable session isolation level is used. Any MySQL
+SELECT query is handled as though it contained _FOR UPDATE_.
+If multiple tests use the same record, deadlocks may occur.
+Create specific test data or isolate the tests in private
+databases.
+
+AUTO INCREMENT values are a global state in a shared database.
+No specific value whatsoever may be expected by any test. It is
+safe to expect the value to increase though.
 
 #### Override your doctrine configuration in tests ####
 ```
