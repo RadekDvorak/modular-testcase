@@ -55,12 +55,10 @@ class TransactionIsolationModule implements IModule
 
 		$lifeCycle->onTearDown[] = function () {
 			$this->stopTransactionWrapper();
-			$this->entityManager->clear();
 		};
 
 		$lifeCycle->onShutDown[] = function () {
 			$this->stopTransactionWrapper();
-			$this->entityManager->clear();
 		};
 	}
 
@@ -114,6 +112,7 @@ class TransactionIsolationModule implements IModule
 		$connection->unwrap();
 
 		$this->isInitialized = FALSE;
+		$this->entityManager->clear();
 	}
 
 
