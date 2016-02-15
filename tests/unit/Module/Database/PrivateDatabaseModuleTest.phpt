@@ -43,7 +43,11 @@ class PrivateDatabaseModuleTest extends TestCase
 
 
 
-	public function testDatabaseSetup()
+	/**
+	 * @dataProvider getDatabaseSetUpEvents
+	 * @param string[] $eventNames
+	 */
+	public function testDatabaseSetup($eventNames)
 	{
 		$lifeCycle = new LifeCycle();
 
@@ -54,9 +58,22 @@ class PrivateDatabaseModuleTest extends TestCase
 		$schemaManager->shouldReceive('dropAndCreateDatabase')->once();
 		$connection->shouldReceive('exec')->with('/^USE /')->once();
 
-		$lifeCycle->onSetUp();
+		foreach ($eventNames as $name) {
+			call_user_func([$lifeCycle, $name]);
+		}
 
 		Environment::$checkAssertions = FALSE;
+	}
+
+
+
+	public function getDatabaseSetUpEvents()
+	{
+		return [
+			[['onInitialized']],
+			[['onSetUp']],
+			[['onInitialized', 'onSetUp']],
+		];
 	}
 
 
