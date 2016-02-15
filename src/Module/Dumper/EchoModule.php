@@ -15,6 +15,9 @@ class EchoModule implements IModule
 	 */
 	public function listen(LifeCycle $lifeCycle)
 	{
+		$lifeCycle->onInitialized[] = function () {
+			echo 'initialized, ';
+		};
 		$lifeCycle->onSetUp[] = function () {
 			echo 'setUp, ';
 		};

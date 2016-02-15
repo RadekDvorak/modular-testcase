@@ -1,6 +1,6 @@
 <?php
 /**
- * @outputMatch foo|bar, setUp, foo, tearDown, success, finally, shutdown.
+ * @outputMatch foo|bar, initialized, setUp, foo, tearDown, success, finally, shutdown.
  */
 
 namespace DamejidloTests\ModularTestCase\Integration\DumperModule;
