@@ -44,7 +44,6 @@ class TransactionIsolationModuleTest extends TestCase
 			call_user_func([$lifeCycle, $eventName]);
 		}
 
-		Assert::true(TRUE);
 		Environment::$checkAssertions = FALSE;
 	}
 
@@ -82,7 +81,6 @@ class TransactionIsolationModuleTest extends TestCase
 			call_user_func([$lifeCycle, $eventName]);
 		}
 
-		Assert::true(TRUE);
 		Environment::$checkAssertions = FALSE;
 	}
 

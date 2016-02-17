@@ -20,7 +20,7 @@ class SharedDatabaseModule implements IModule
 	/**
 	 * @var string[]
 	 */
-	private $tableSqlFiles;
+	private $schemaFiles;
 
 	/**
 	 * @var string
@@ -43,15 +43,15 @@ class SharedDatabaseModule implements IModule
 	 * @param Connection $connection
 	 * @param ILock $lock
 	 * @param DataLoader $dataLoader
-	 * @param string[] $tableSqlFiles
+	 * @param string[] $schemaFiles
 	 * @param string $namePrefix
 	 */
-	public function __construct(Connection $connection, ILock $lock, DataLoader $dataLoader, array $tableSqlFiles, $namePrefix)
+	public function __construct(Connection $connection, ILock $lock, DataLoader $dataLoader, array $schemaFiles, $namePrefix)
 	{
 		$this->connection = $connection;
 		$this->lock = $lock;
 		$this->dataLoader = $dataLoader;
-		$this->tableSqlFiles = $tableSqlFiles;
+		$this->schemaFiles = $schemaFiles;
 		$this->namePrefix = $namePrefix;
 	}
 
@@ -94,7 +94,7 @@ class SharedDatabaseModule implements IModule
 			try {
 				$schemaManager->createDatabase($databaseName);
 				$this->connection->exec("USE `$databaseName`");
-				$this->dataLoader->loadFiles($this->connection, $this->tableSqlFiles);
+				$this->dataLoader->loadFiles($this->connection, $this->schemaFiles);
 			} catch (\Exception $e) {
 				$schemaManager->dropDatabase($databaseName);
 				throw $e;

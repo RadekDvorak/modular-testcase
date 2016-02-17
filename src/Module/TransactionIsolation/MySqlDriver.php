@@ -17,6 +17,7 @@ class MySqlDriver extends Driver
 	public function connect(array $params, $username = NULL, $password = NULL, array $driverOptions = [])
 	{
 		try {
+			// create our special driver
 			$conn = new PDOConnection(
 				$this->constructPdoDsn($params),
 				$username,

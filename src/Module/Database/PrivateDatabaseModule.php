@@ -4,7 +4,7 @@ namespace Damejidlo\ModularTestCase\Module\Database;
 
 use Damejidlo\ModularTestCase\LifeCycle;
 use Damejidlo\ModularTestCase\Module\IModule;
-use Damejidlo\ModularTestCase\Posix;
+use Damejidlo\ModularTestCase\ProcessIdProvider;
 use Kdyby\Doctrine\Connection;
 
 
@@ -20,7 +20,7 @@ class PrivateDatabaseModule implements IModule
 	/**
 	 * @var string[]
 	 */
-	private $tableSqlFiles;
+	private $schemaFiles;
 
 	/**
 	 * @var string
@@ -28,9 +28,9 @@ class PrivateDatabaseModule implements IModule
 	private $namePrefix;
 
 	/**
-	 * @var Posix
+	 * @var ProcessIdProvider
 	 */
-	private $posix;
+	private $processIdProvider;
 
 	/**
 	 * @var string
@@ -50,18 +50,23 @@ class PrivateDatabaseModule implements IModule
 
 
 	/**
-	 * @param Posix $posix
+	 * @param ProcessIdProvider $processIdProvider
 	 * @param Connection $connection
 	 * @param DataLoader $dataLoader
-	 * @param string[] $tableSqlFiles
+	 * @param string[] $schemaFiles
 	 * @param string $namePrefix
 	 */
-	public function __construct(Posix $posix, Connection $connection, DataLoader $dataLoader, array $tableSqlFiles, $namePrefix)
-	{
-		$this->posix = $posix;
+	public function __construct(
+		ProcessIdProvider $processIdProvider,
+		Connection $connection,
+		DataLoader $dataLoader,
+		array $schemaFiles,
+		$namePrefix
+	) {
+		$this->processIdProvider = $processIdProvider;
 		$this->connection = $connection;
 		$this->dataLoader = $dataLoader;
-		$this->tableSqlFiles = $tableSqlFiles;
+		$this->schemaFiles = $schemaFiles;
 		$this->namePrefix = $namePrefix;
 	}
 
@@ -78,6 +83,10 @@ class PrivateDatabaseModule implements IModule
 
 		$lifeCycle->onSetUp[] = function () {
 			$this->createDatabase();
+		};
+
+		$lifeCycle->onTearDown[] = function () {
+			$this->isInitialized = FALSE;
 		};
 
 		$lifeCycle->onShutDown[] = function () {
@@ -103,12 +112,12 @@ class PrivateDatabaseModule implements IModule
 			return;
 		}
 
-		$databaseName = $this->databaseName = sprintf('%s_%d', $this->namePrefix, $this->posix->getPid());
+		$databaseName = $this->databaseName = sprintf('%s_%d', $this->namePrefix, $this->processIdProvider->getPid());
 		$schemaManager = $this->connection->getSchemaManager();
 
 		$schemaManager->dropAndCreateDatabase($databaseName);
 		$this->connection->exec("USE `$databaseName`");
-		$this->dataLoader->loadFiles($this->connection, $this->tableSqlFiles);
+		$this->dataLoader->loadFiles($this->connection, $this->schemaFiles);
 		$this->isInitialized = TRUE;
 	}
 

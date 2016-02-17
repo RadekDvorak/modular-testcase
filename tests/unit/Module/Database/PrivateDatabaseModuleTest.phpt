@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../../bootstrap.php';
 use Damejidlo\ModularTestCase\LifeCycle;
 use Damejidlo\ModularTestCase\Module\Database\DataLoader;
 use Damejidlo\ModularTestCase\Module\Database\PrivateDatabaseModule;
-use Damejidlo\ModularTestCase\Posix;
+use Damejidlo\ModularTestCase\ProcessIdProvider;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Kdyby\Doctrine\Connection;
 use Mockery;
@@ -46,17 +46,19 @@ class PrivateDatabaseModuleTest extends TestCase
 	/**
 	 * @dataProvider getDatabaseSetUpEvents
 	 * @param string[] $eventNames
+	 * @param int $initializationCount
 	 */
-	public function testDatabaseSetup($eventNames)
+	public function testDatabaseSetup($eventNames, $initializationCount)
 	{
 		$lifeCycle = new LifeCycle();
 
 		$schemaManager = $this->mockSchemaManager();
 		$connection = $this->mockConnection($schemaManager);
-		$this->createPrivateDatabaseModule($connection, $lifeCycle);
+		$dataLoader = $this->mockDataLoader($initializationCount);
+		$this->createPrivateDatabaseModule($connection, $lifeCycle, $dataLoader);
 
-		$schemaManager->shouldReceive('dropAndCreateDatabase')->once();
-		$connection->shouldReceive('exec')->with('/^USE /')->once();
+		$schemaManager->shouldReceive('dropAndCreateDatabase')->times($initializationCount);
+		$connection->shouldReceive('exec')->with('/^USE /')->times($initializationCount);
 
 		foreach ($eventNames as $name) {
 			call_user_func([$lifeCycle, $name]);
@@ -70,9 +72,10 @@ class PrivateDatabaseModuleTest extends TestCase
 	public function getDatabaseSetUpEvents()
 	{
 		return [
-			[['onInitialized']],
-			[['onSetUp']],
-			[['onInitialized', 'onSetUp']],
+			[['onInitialized'], 1],
+			[['onSetUp'], 1],
+			[['onInitialized', 'onSetUp'], 1],
+			[['onInitialized', 'onSetUp', 'onTearDown', 'onSetUp', 'onTearDown', 'onSetUp', 'onTearDown'], 3],
 		];
 	}
 
@@ -84,7 +87,8 @@ class PrivateDatabaseModuleTest extends TestCase
 
 		$schemaManager = $this->mockSchemaManager();
 		$connection = $this->mockConnection($schemaManager);
-		$this->createPrivateDatabaseModule($connection, $lifeCycle);
+		$dataLoader = $this->mockDataLoader();
+		$this->createPrivateDatabaseModule($connection, $lifeCycle, $dataLoader);
 
 		$schemaManager->shouldReceive('dropAndCreateDatabase');
 		$connection->shouldReceive('exec');
@@ -109,13 +113,13 @@ class PrivateDatabaseModuleTest extends TestCase
 	/**
 	 * @param Connection $connection
 	 * @param LifeCycle $lifeCycle
+	 * @param DataLoader $dataLoader
 	 * @return PrivateDatabaseModule
 	 */
-	private function createPrivateDatabaseModule(Connection $connection, LifeCycle $lifeCycle)
+	private function createPrivateDatabaseModule(Connection $connection, LifeCycle $lifeCycle, DataLoader $dataLoader)
 	{
-		$posix = $this->mockPosix();
-		$dataLoader = $this->mockDataLoader();
-		$module = new PrivateDatabaseModule($posix, $connection, $dataLoader, self::SQL_FILES, self::DB_PREFIX);
+		$processIdProvider = $this->mockProcessIdProvider();
+		$module = new PrivateDatabaseModule($processIdProvider, $connection, $dataLoader, self::SQL_FILES, self::DB_PREFIX);
 
 		$module->listen($lifeCycle);
 		$module->setParameters([]);
@@ -126,12 +130,12 @@ class PrivateDatabaseModuleTest extends TestCase
 
 
 	/**
-	 * @return Posix|MockInterface
+	 * @return ProcessIdProvider|MockInterface
 	 */
-	private function mockPosix()
+	private function mockProcessIdProvider()
 	{
-		/** @var Posix|MockInterface $posix */
-		$posix = Mockery::mock(Posix::class);
+		/** @var ProcessIdProvider|MockInterface $posix */
+		$posix = Mockery::mock(ProcessIdProvider::class);
 		$posix->shouldReceive('getPid')->andReturn(self::MY_PID);
 
 		return $posix;
@@ -157,11 +161,11 @@ class PrivateDatabaseModuleTest extends TestCase
 	/**
 	 * @return DataLoader|MockInterface
 	 */
-	private function mockDataLoader()
+	private function mockDataLoader($callCount = 1)
 	{
 		/** @var DataLoader|MockInterface $dataLoader */
 		$dataLoader = Mockery::mock(DataLoader::class);
-		$dataLoader->shouldReceive('loadFiles')->once();
+		$dataLoader->shouldReceive('loadFiles')->times($callCount);
 
 		return $dataLoader;
 	}

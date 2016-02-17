@@ -71,23 +71,6 @@ class ModularTestCase extends TestCase
 
 
 	/**
-	 * @param string $type
-	 * @return object
-	 */
-	protected function getService($type)
-	{
-		$container = $this->getContainer();
-		$object = $container->getByType($type, FALSE);
-		if (!$object) {
-			$object = $container->createInstance($type);
-		}
-
-		return $object;
-	}
-
-
-
-	/**
 	 * @return IContainerFactory
 	 */
 	public function getContainerFactory()

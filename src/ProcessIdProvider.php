@@ -4,7 +4,7 @@ namespace Damejidlo\ModularTestCase;
 
 
 
-class Posix
+class ProcessIdProvider
 {
 
 	/**

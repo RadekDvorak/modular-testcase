@@ -97,8 +97,6 @@ class SharedDatabaseModuleTest extends TestCase
 		$schemaManager->shouldReceive('dropDatabase');
 
 		$lifeCycle->onInitialized();
-
-		Environment::$checkAssertions = FALSE;
 	}
 
 
@@ -117,8 +115,6 @@ class SharedDatabaseModuleTest extends TestCase
 		$this->createSharedDatabaseModule($connection, $lock, $dataLoader, $lifeCycle);
 
 		$lifeCycle->onInitialized();
-
-		Environment::$checkAssertions = FALSE;
 	}
 
 
