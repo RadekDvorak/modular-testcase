@@ -1,0 +1,32 @@
+{
+	"name": "damejidlo/modular-testcase",
+	"description": "Modular test case for Nette Tester",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"authors": [
+		{
+			"name": "Radek Dvořák",
+			"email": "radek.dvorak@gmail.com"
+		}
+	],
+	"require": {
+		"nette/tester": "^1.6.1",
+		"nette/utils": "^2.3",
+		"doctrine/annotations": "^1.2",
+		"nette/di": "^2.3"
+	},
+	"require-dev": {
+		"kdyby/doctrine": "^3.0.1",
+		"mockery/mockery": "^0.9.4",
+		"nette/bootstrap": "^2.3",
+		"tracy/tracy": "^2.3"
+	},
+	"suggest": {
+		"kdyby/doctrine": "For database related modules"
+	},
+	"autoload": {
+		"psr-4": {
+			"Damejidlo\\ModularTestCase\\": "src/"
+		}
+	}
+}
