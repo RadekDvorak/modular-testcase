@@ -1,0 +1,31 @@
+parameters:
+	modularTestCase:
+		database:
+			schema:
+				files: []
+				prefix:
+					private: x_private_
+					shared: x_shared_
+
+services:
+	- Damejidlo\ModularTestCase\ProcessIdProvider
+	- Damejidlo\ModularTestCase\Module\Database\DataLoader
+	- Damejidlo\ModularTestCase\Lock\FileLock
+	- Damejidlo\ModularTestCase\Module\TransactionIsolation\TransactionIsolationModule
+
+	privateDatabaseModule:
+		class: Damejidlo\ModularTestCase\Module\Database\PrivateDatabaseModule
+		arguments:
+			schemaFiles: %modularTestCase.database.schema.files%
+			namePrefix: %modularTestCase.database.schema.prefix.private%
+	sharedDatabaseModule:
+		class: Damejidlo\ModularTestCase\Module\Database\SharedDatabaseModule
+		arguments:
+			schemaFiles: %modularTestCase.database.schema.files%
+			namePrefix: %modularTestCase.database.schema.prefix.shared%
+
+doctrine:
+	metadataCache: Doctrine\Common\Cache\VoidCache
+	queryCache: Doctrine\Common\Cache\VoidCache
+	hydrationCache: Doctrine\Common\Cache\VoidCache
+	resultCache: Doctrine\Common\Cache\VoidCache

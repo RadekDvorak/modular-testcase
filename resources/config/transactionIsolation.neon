@@ -1,0 +1,6 @@
+doctrine:
+	wrapperClass: Damejidlo\ModularTestCase\Module\TransactionIsolation\UncommittedKdybyConnection
+	driverClass: Damejidlo\ModularTestCase\Module\TransactionIsolation\MySqlDriver
+	driverOptions:
+		# \PDO::ATTR_ERRMODE: \PDO::ERRMODE_EXCEPTION
+		3: 2

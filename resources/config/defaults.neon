@@ -1,0 +1,8 @@
+common:
+	includes:
+		- core.neon
+		- database.neon
+		- transactionIsolation.neon
+		- database-local.neon
+
+production < common:
