@@ -1,0 +1,11 @@
+parameters:
+	modularTestCase:
+		database:
+			schema:
+				files:
+					- %appDir%/sql/schema.sql
+					- %appDir%/sql/schema_depot.sql
+					- %appDir%/../tests/sql/empty-database.sql
+				prefix:
+					private: x_private_logistika
+					shared: x_shared_logistika
